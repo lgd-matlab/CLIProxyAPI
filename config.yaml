@@ -1,0 +1,40 @@
+services:
+  cli-proxy-api:
+    image: eceasy/cli-proxy-api:latest
+    restart: unless-stopped
+
+    # Persist tokens (OAuth logins) so you don't lose them after redeploy
+    volumes:
+      # 1) auth directory (Coolify will create it)
+      - type: bind
+        source: ./auths
+        target: /root/.cli-proxy-api
+        is_directory: true
+
+      # 2) config.yaml (Coolify will create this file with the content below)
+      - type: bind
+        source: ./config.yaml
+        target: /CLIProxyAPI/config.yaml
+        content: |
+          port: 8317
+          auth-dir: "~/.cli-proxy-api"
+          request-retry: 3
+          quota-exceeded:
+            switch-project: true
+            switch-preview-model: true
+          api-keys:
+            - "ABC-CHANGE-ME-123456"
+
+    # Recommended on Coolify: don't publish ports; use the proxy via domain/labels. :contentReference[oaicite:1]{index=1}
+    # If you want it ONLY for internal use, you can keep it like this:
+    expose:
+      - "8317"
+
+    # Option A (recommended): after deploy, use Coolify UI "Generate Domain" for this service.
+    # Option B (works without UI): set your domain here via Traefik labels. :contentReference[oaicite:2]{index=2}
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.clipxy.rule=Host(`YOUR_DOMAIN.com`)"
+      - "traefik.http.routers.clipxy.entryPoints=http,https"
+      - "traefik.http.routers.clipxy.tls=true"
+      - "traefik.http.services.clipxy.loadbalancer.server.port=8317"
