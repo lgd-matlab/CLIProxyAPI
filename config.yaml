@@ -1,43 +1,24 @@
-services:
-  cli-proxy-api:
-    image: eceasy/cli-proxy-api:latest
-    restart: unless-stopped
+# 监听地址："" 表示监听所有网卡 (IPv4+IPv6)
+# （这点对 Coolify/Traefik 很关键：不要只听 localhost）
+host: ""
 
-    volumes:
-      - type: bind
-        source: ./auths
-        target: /root/.cli-proxy-api
-        is_directory: true
+port: 8317
 
-      # IMPORTANT: use a different filename so it doesn't clash with docker-compose.yml
-      - type: bind
-        source: ./cli-proxy-config.yaml
-        target: /CLIProxyAPI/config.yaml
-        content: |
-          port: 8317
-          auth-dir: "~/.cli-proxy-api"
-          request-retry: 3
-          quota-exceeded:
-            switch-project: true
-            switch-preview-model: true
+auth-dir: "~/.cli-proxy-api"
+request-retry: 3
 
-          # Management API settings (for /management.html and /v0/management)
-          remote-management:
-            # allow remote access from your laptop (non-localhost)
-            allow-remote: true
-            # REQUIRED: if empty, /v0/management is disabled (404)
-            secret-key: "CHANGE-THIS-MGMT-KEY"
-            # keep the built-in management.html enabled
-            disable-control-panel: false
-            panel-github-repository: "https://github.com/router-for-me/Cli-Proxy-API-Management-Center"
+quota-exceeded:
+  switch-project: true
+  switch-preview-model: true
 
-          api-keys:
-            - "ABC-CHANGE-ME-123456"
+# 远程管理（management.html 依赖 /v0/management）
+remote-management:
+  # 你要在公网域名打开 management.html，就需要 true
+  allow-remote: true
+  # 不填会直接禁用管理 API（/v0/management 404）
+  secret-key: "CHANGE-THIS-TO-A-LONG-RANDOM-KEY"
+  disable-control-panel: false
+  panel-github-repository: "https://github.com/router-for-me/Cli-Proxy-API-Management-Center"
 
-    expose:
-      - "8317"
-
-    # If you already added a Domain in Coolify UI (sslip.io), you can REMOVE labels entirely.
-    # (Leaving the placeholder YOUR_DOMAIN.com can create a useless router rule.)
-    labels:
-      - traefik.enable=true
+api-keys:
+  - "ABC-CHANGE-ME-123456"
