@@ -5,6 +5,12 @@ services:
     expose:
       - "8317"
     volumes:
-      - ./config.yaml:/CLIProxyAPI/config.yaml
-      - ./auths:/root/.cli-proxy-api
-      - ./logs:/CLIProxyAPI/logs
+      - type: bind
+        source: ./config.yaml
+        target: /CLIProxyAPI/config.yaml
+      - type: bind
+        source: ./auths
+        target: /root/.cli-proxy-api
+      - type: bind
+        source: ./logs
+        target: /CLIProxyAPI/logs
