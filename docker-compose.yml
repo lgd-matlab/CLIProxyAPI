@@ -3,11 +3,15 @@ services:
     image: eceasy/cli-proxy-api:latest
     restart: unless-stopped
 
-    # 只给 Coolify/Traefik 看见容器端口（不映射到宿主机）
+    # Let Coolify/Traefik route to the container port (no host port publish needed)
     expose:
       - "8317"
 
     volumes:
-      - ./config.yaml:/CLIProxyAPI/config.yaml:ro
-      - ./auths:/root/.cli-proxy-api
-      - ./logs:/CLIProxyAPI/logs
+      - ./cli-proxy-config.yaml:/CLIProxyAPI/config.yaml:ro
+      - cli_proxy_auths:/root/.cli-proxy-api
+      - cli_proxy_logs:/CLIProxyAPI/logs
+
+volumes:
+  cli_proxy_auths:
+  cli_proxy_logs:
