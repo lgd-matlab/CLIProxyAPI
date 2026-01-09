@@ -2,10 +2,8 @@ services:
   cli-proxy-api:
     image: eceasy/cli-proxy-api:latest
     restart: unless-stopped
-
     expose:
       - "8317"
-
     volumes:
       - type: bind
         source: ./auths
@@ -30,8 +28,3 @@ services:
             panel-github-repository: "https://github.com/router-for-me/Cli-Proxy-API-Management-Center"
           api-keys:
             - "ABC-CHANGE-ME-123456"
-
-      - type: bind
-        source: ./logs
-        target: /CLIProxyAPI/logs
-        is_directory: true
