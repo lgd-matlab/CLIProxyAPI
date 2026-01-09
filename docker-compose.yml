@@ -3,15 +3,35 @@ services:
     image: eceasy/cli-proxy-api:latest
     restart: unless-stopped
 
-    # Let Coolify/Traefik route to the container port (no host port publish needed)
     expose:
       - "8317"
 
     volumes:
-      - ./cli-proxy-config.yaml:/CLIProxyAPI/config.yaml:ro
-      - cli_proxy_auths:/root/.cli-proxy-api
-      - cli_proxy_logs:/CLIProxyAPI/logs
+      - type: bind
+        source: ./auths
+        target: /root/.cli-proxy-api
+        is_directory: true
 
-volumes:
-  cli_proxy_auths:
-  cli_proxy_logs:
+      - type: bind
+        source: ./config.yaml
+        target: /CLIProxyAPI/config.yaml
+        content: |
+          host: ""
+          port: 8317
+          auth-dir: "~/.cli-proxy-api"
+          request-retry: 3
+          quota-exceeded:
+            switch-project: true
+            switch-preview-model: true
+          remote-management:
+            allow-remote: true
+            secret-key: "CHANGE-THIS-TO-A-LONG-RANDOM-KEY"
+            disable-control-panel: false
+            panel-github-repository: "https://github.com/router-for-me/Cli-Proxy-API-Management-Center"
+          api-keys:
+            - "ABC-CHANGE-ME-123456"
+
+      - type: bind
+        source: ./logs
+        target: /CLIProxyAPI/logs
+        is_directory: true
