@@ -36,3 +36,8 @@ services:
         source: ./logs
         target: /CLIProxyAPI/logs
         is_directory: true
+
+      - type: bind
+        source: ./plugins
+        target: /CLIProxyAPI/plugins
+        is_directory: true
